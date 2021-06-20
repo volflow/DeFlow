@@ -1,0 +1,128 @@
+#### general settings
+name: DeFlow-AIM-RWSR
+use_tb_logger: true
+model: SRFL_Glow
+distortion: sr
+scale: 8
+gpu_ids: [0,] # should be equal to $CUDA_VISIBLE_DEVICES
+
+
+#### datasets
+datasets:
+  train:
+    name: train
+    mode: LQGT_multiclass 
+    # use create_train_dataset.py to create downsampled datasets
+    dataroot_GT: [../datasets/AIM-RWSR/train-clean-images/4x/,  # DIV2k clean 4x
+                  ../datasets/AIM-RWSR/train-noisy-images/1x/]  # AIM19 noisy 1x
+    dataroot_LQ: [../datasets/AIM-RWSR/train-clean-images/32x/, # DIV2k clean 16x
+                  ../datasets/AIM-RWSR/train-noisy-images/8x/]  # AIM19 noisy 4x
+    n_workers: 3  # per GPU
+    preload: False # set true to load images into ram for faster training
+    batch_size: 8
+    balanced: true
+    use_shuffle: true
+    use_flip: true
+    use_crop: true
+    color: RGB
+    GT_size: 160
+    quant: 32
+    alignment: 8
+    normalize: # chanel-wise statistics over domains and lr/hr [values are precomputed]
+      mean_noisy_hr: [120.71678252, 115.66740282, 104.7566205]
+      std_noisy_hr: [54.14952531, 52.60073718, 55.64991431]
+      mean_noisy_lr: [120.71671803, 115.66735471, 104.75649595]
+      std_noisy_lr: [50.67423609, 49.07204813, 52.3704119]
+
+      mean_clean_hr: [114.47609804, 111.67182033, 103.29093697]
+      std_clean_hr: [59.98190873, 57.2422813,  59.9127576]
+      mean_clean_lr: [114.36107384, 111.57875743, 103.19098391]
+      std_clean_lr: [53.36256634, 50.91536884, 54.04613198]
+    
+  val:
+    name: val
+    mode: LQGT_multiclass 
+    dataroot_GT: [../datasets/AIM-RWSR/valid-gt-clean/4x/,    # DIV2k clean 4x
+                  ../datasets/AIM-RWSR/valid-input-noisy/1x/] # AIM19 noisy 1x
+    dataroot_LQ: [../datasets/AIM-RWSR/valid-gt-clean/32x/,   # DIV2k clean 16x
+                  ../datasets/AIM-RWSR/valid-input-noisy/8x/] # AIM19 noisy 4x
+    preload: False # set true to load images into ram for faster training
+    center_crop_hr_size: 160
+    quant: 32
+    n_max: 5
+    alignment: 8
+    normalize:
+      mean_noisy_hr: [120.71678252, 115.66740282, 104.7566205 ]
+      std_noisy_hr: [54.14952531, 52.60073718, 55.64991431]
+      mean_noisy_lr: [120.71671803, 115.66735471, 104.75649595]
+      std_noisy_lr: [50.67423609, 49.07204813, 52.3704119 ]
+
+      mean_clean_hr: [114.47609804, 111.67182033, 103.29093697]
+      std_clean_hr: [59.98190873, 57.2422813,  59.9127576]
+      mean_clean_lr: [114.36107384, 111.57875743, 103.19098391]
+      std_clean_lr: [53.36256634, 50.91536884, 54.04613198]
+
+#### network structures
+network_G:
+  which_model_G: RRDBGlowNet
+  in_nc: 3
+  out_nc: 3
+  nf: 64
+  nb: 23
+  upscale: 8
+  train_RRDB: true
+  
+  flow:
+    K: 16
+    L: 3
+    noInitialInj: true
+    LU_decomposed: true
+    coupling: CondAffineSeparatedAndCond
+    additionalFlowNoAffine: 2
+    split:
+      enable: true
+    fea_up0: true
+    stackRRDB:
+      blocks: [1, 8, 15, 22]
+      concat: true
+    shift:
+      constant: correlated
+      classes: [[0,1],]
+      std_init_shift: 0.0
+    LR_noise_std: 0.03
+    CondAffineSeparatedAndCond:
+      eps: 0.001
+      multReverse: True
+      hidden_channels: 128
+
+#### path
+path:
+  root: ../ # training results & checkpoints are saved in {root}/experiments
+  pretrain_model_G: ../trained_models/RRDB_models/RRDB_PSNR_x8.pth
+  strict_load: true
+  resume_state: auto # starts training from last checkpoint if one exists
+
+#### training settings: learning rate scheme, loss
+train:
+  manual_seed: 10
+  lr_G: !!float 1.0e-4
+  weight_decay_G: 0
+  beta1: 0.9
+  beta2: 0.99
+  lr_scheme: MultiStepLR
+  warmup_iter: -1  # no warm up
+  lr_steps_rel: [0.5, 0.75, 0.9, 0.95]
+  lr_gamma: 0.5
+
+  niter: 100000
+  val_freq: 20000
+
+#### validation settings
+val:
+  heats: [1.0]
+  n_sample: 1
+
+#### logger
+logger:
+  print_freq: 100
+  save_checkpoint_freq: !!float 5e3
