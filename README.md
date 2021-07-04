@@ -101,11 +101,11 @@ cd ./codes
 CUDA_VISIBLE_DEVICES=-1 python translate.py -opt DeFlow-AIM-RWSR.yml -model_path ../trained_models/DeFlow_models/DeFlow-AIM-RWSR-100k.pth -source_dir ../datasets/AIM-RWSR/train-clean-images/4x/ -out_dir ../datasets/AIM-RWSR/train-clean-images/4x_degraded/
 ```
 
-## The downstream ESRGAN models
+## Downstream ESRGAN Models
 We use the code from https://github.com/jixiaozhong/RealSR to train and test the ESRGAN models on the high-resolution `/1x/` and low-resolution `/4x_degraded/` data that we showed how to generate in the previous section.  
 
 
-**ESRGAN Setup**
+**ESRGAN Setup**  
 First you need to clone the RealSR repository and install its additional dependencies:
 
 ```bash
@@ -117,7 +117,7 @@ git clone https://github.com/Tencent/Real-SR.git
 pip install lmdb
 ```
 
-**ESRGAN Model Validation**
+**ESRGAN Model Validation**  
 First you need to download the vaildation datasets with the provided scripts as explained above.   
 Then run `Real-SR/codes/test.py` script with the corresponding config file:
 
@@ -137,7 +137,7 @@ The resulting upscaled and restored images can then be found in `DeFlow/Real-SR/
 To run the testing code without a GPU or if you get CUDA out-of-memory you can change line 11 in `DeFlow/Real-SR/codes/models/base_model.py` to `self.device = 'cpu'` and prepend `CUDA_VISIBLE_DEVICES=-1` to the commands.
 
 
-**ESRGAN Training**
+**ESRGAN Training**  
 First you need to generate the synthetic training data as explained above.   
 Then run `Real-SR/codes/train.py` script with the corresponding config file:
 
