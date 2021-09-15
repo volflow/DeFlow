@@ -7,6 +7,9 @@ Official implementation of the paper *DeFlow: Learning Complex Image Degradation
   <img src="./DeFlow_opening_figure.png" />
 </p>
 
+Watch our oral presentation video:
+https://www.youtube.com/embed/Q5kI4MeZaeg
+
 ## Setup and Installation
 ```bash
 # create and activate new conda environment
