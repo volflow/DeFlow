@@ -2,13 +2,15 @@
 Official implementation of the paper *DeFlow: Learning Complex Image Degradations from Unpaired Data with Conditional Flows*  
 
 [[Paper] CVPR 2021 Oral](https://arxiv.org/abs/2101.05796)
+<p align="center">
+  <img src="./DeFlow_opening_figure.png" width="400"/>
+</p>
 
 **Watch our oral presentation:**  
 [![DeFlow CVPR presentation video](http://img.youtube.com/vi/Q5kI4MeZaeg/0.jpg)](http://www.youtube.com/watch?v=Q5kI4MeZaeg "CVPR2021(Oral) DeFlow: Learning Complex Image Degradations from Unpaired Data with Conditional Flows")
 
-<p align="center">
-  <img src="./DeFlow_opening_figure.png" />
-</p>
+
+
 
 ## Setup and Installation
 ```bash
