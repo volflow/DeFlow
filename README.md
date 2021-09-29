@@ -92,7 +92,7 @@ If your GPU has enough memory or `-crop_size` is set small enough you can remove
 The resulting images are saved to a subfolder in `./results/` which again contains four subfolders:
 - `/0_to_1/` contains images from domain X (clean) translated to domain Y (noisy). This adds the synthetic degradations
 - `/1_to_0/` contains images from domain Y (noisy) translated to domain X (clean). This reverses the degradation model and shows some denoising performance
-- `/0_gen/` and the `/1_gen/` folders contain samples from the conditional distributions p_X(x|h(x)) and p_Y(x|h(x)), respectively
+- `/0_gen/` and the `/1_gen/` folders contain samples from the conditional distributions p_X(x|h(x)) and p_Y(y|h(y)), respectively
 
 ## Generate Synthetic Datasets for Downstream ESRGAN models
 To apply the DeFlow degradation model to a folder of high-quality images use the `translate.py` script.
