@@ -74,8 +74,8 @@ network_G:
 
 #### path
 path:
-  root: /srv/beegfs02/scratch/data_aim2019/data/STValentin/ 
-  pretrain_model_G: /srv/beegfs02/scratch/data_aim2019/data/STValentin/models/RRDB_PSNR_x4.pth #/srv/beegfs02/scratch/data_aim2019/data/STValentin/models/SrgDf2kRRDB23X4Qn32_K16_L3_sp_CondAffineSeparatedAndCond_FlowNoAff2_n200000_fullDSNoRot_lr25e-5s05s075s09s095_RrdbD05_RRDBStack4_latest_G.pth #
+  root: D:/DeFlow/DeFlow/codes
+  pretrain_model_G: ../trained_models/RRDB_models/RRDB_PSNR_x4.pth
   strict_load: true
   resume_state: auto
 
@@ -91,8 +91,8 @@ train:
   lr_steps_rel: [0.5, 0.75, 0.9, 0.95]
   lr_gamma: 0.5
 
-  niter: 100000
-  val_freq: 20000
+  niter: 2000
+  val_freq: 400
 
 #### validation settings
 val:

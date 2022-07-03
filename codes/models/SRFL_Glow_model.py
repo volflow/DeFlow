@@ -379,6 +379,7 @@ class SRFLGLOWModel(BaseModel):
             self.load_network(get_resume_model_path, self.netG, strict=self.opt['path'].get('strict_load', True), submodule=None)
             return
 
+        # self.opt['path']['pretrain_model_G'] = '../trained_models/RRDB_models/RRDB_PSNR_x4.pth'    # Rafael
         load_path_G = self.opt['path']['pretrain_model_G']
         load_submodule = self.opt['path']['load_submodule'] if 'load_submodule' in self.opt['path'].keys() else 'RRDB'
         if load_path_G is not None:
