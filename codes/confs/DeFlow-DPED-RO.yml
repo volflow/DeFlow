@@ -12,10 +12,17 @@ datasets:
   train:
     name: Iphone_DSLR_tr
     mode: LQGT_multiclass
-    dataroot_GT: [ ../datasets/DPED-RO/DPEDiphone-tr-y/4x/,
-                   ../datasets/DPED-RO/DPEDiphone-tr-x/1x/ ]
-    dataroot_LQ: [ ../datasets/DPED-RO/DPEDiphone-tr-y/16x/,
-                   ../datasets/DPED-RO/DPEDiphone-tr-x/4x_reshaped/ ]
+
+    dataroot_GT: [ ../datasets/DPED-RO/DPEDiphone-tr-x/4x/,  # DSLR clean 4x
+                   ../datasets/DPED-RO/DPEDiphone-tr-y/1x/ ]          # iphone clean 1x
+    dataroot_LQ: [ ../datasets/DPED-RO/DPEDiphone-tr-x/16x/, # DSLR clean 16x
+                   ../datasets/DPED-RO/DPEDiphone-tr-y/4x/ ]          # iphone clean 4x
+
+    # setup that didn't work well for DPED-RO:
+#    dataroot_GT: [ ../datasets/DPED-RO/DPEDiphone-tr-y/4x/,
+#                   ../datasets/DPED-RO/DPEDiphone-tr-x/1x/ ]
+#    dataroot_LQ: [ ../datasets/DPED-RO/DPEDiphone-tr-y/16x/,
+#                   ../datasets/DPED-RO/DPEDiphone-tr-x/4x_reshaped/ ]
 
     n_workers: 3  # per GPU
     preload: False # set true to load images into ram for faster training
@@ -30,11 +37,18 @@ datasets:
     
   val:
     name: Iphone_DSLR_va
-    mode: LQGT_multiclass 
-    dataroot_GT: [../datasets/DPED-RO/DPEDiphone-val-y/4x/,
-                  ../datasets/DPED-RO/DPEDiphone-val-x/1x]
-    dataroot_LQ: [../datasets/DPED-RO/DPEDiphone-val-y/16x/,
-                  ../datasets/DPED-RO/DPEDiphone-val-x/4x_reshaped/]
+    mode: LQGT_multiclass
+
+    dataroot_GT: [ ../datasets/DPED-RO/DPEDiphone-val-x/4x/,   # DSLR clean 4x
+                   ../datasets/DPED-RO/DPEDiphone-val-y/1x/ ]           # iphone clean 1x
+    dataroot_LQ: [ ../datasets/DPED-RO/DPEDiphone-val-x/16x/,  # DSLR clean 16x
+                   ../datasets/DPED-RO/DPEDiphone-val-y/4x/ ]           # iphone clean 4x
+
+    # setup that didn't work well for DPED-RO:
+#    dataroot_GT: [../datasets/DPED-RO/DPEDiphone-val-y/4x/,
+#                  ../datasets/DPED-RO/DPEDiphone-val-x/1x]
+#    dataroot_LQ: [../datasets/DPED-RO/DPEDiphone-val-y/16x/,
+#                  ../datasets/DPED-RO/DPEDiphone-val-x/4x_reshaped/]
     preload: False # set true to load images into ram for faster training
     center_crop_hr_size: 160
     quant: 32
@@ -74,9 +88,9 @@ network_G:
 
 #### path
 path:
-  root: D:/DeFlow/DeFlow/codes
+  root: ../ # training results & checkpoints are saved in {root}/experiments
   pretrain_model_G: ../trained_models/RRDB_models/RRDB_PSNR_x4.pth
-  strict_load: true
+  strict_load: false
   resume_state: auto
 
 #### training settings: learning rate scheme, loss
@@ -91,8 +105,8 @@ train:
   lr_steps_rel: [0.5, 0.75, 0.9, 0.95]
   lr_gamma: 0.5
 
-  niter: 10000
-  val_freq: 500
+  niter: 100000
+  val_freq: 20000
 
 #### validation settings
 val:
