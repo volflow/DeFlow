@@ -19,7 +19,7 @@ datasets:
                   ../datasets/AIM-RWSR/train-noisy-images/8x/]  # AIM19 noisy 4x
     n_workers: 3  # per GPU
     preload: False # set true to load images into ram for faster training
-    batch_size: 8
+    batch_size: 1
     balanced: true
     use_shuffle: true
     use_flip: true

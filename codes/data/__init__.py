@@ -27,12 +27,17 @@ def create_dataloader(dataset, dataset_opt, opt=None, sampler=None):
             batch_size = dataset_opt['batch_size']
             shuffle = True
         if sampler is not None:
-            return torch.utils.data.DataLoader(dataset, batch_size=batch_size,
-                                           num_workers=num_workers, sampler=sampler, drop_last=True,
-                                           pin_memory=False)
-        return torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=shuffle,
-                                           num_workers=num_workers, sampler=sampler, drop_last=True,
-                                           pin_memory=False)
+            #return torch.utils.data.DataLoader(dataset, batch_size=batch_size,
+                                           #num_workers=num_workers, sampler=sampler, drop_last=True,
+                                           #pin_memory=False)
+            return torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=False, num_workers=0,
+                                           pin_memory=True)
+        #return torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=shuffle,
+                                           #num_workers=num_workers, sampler=sampler, drop_last=True,
+                                           #pin_memory=False)
+        return torch.utils.data.DataLoader(dataset, batch_size=1,
+                                           shuffle=False, num_workers=0,
+                                           pin_memory=True)
     else:
         return torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=False, num_workers=0,
                                            pin_memory=True)

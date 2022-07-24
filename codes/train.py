@@ -44,6 +44,7 @@ def main():
                         help='job launcher')
     parser.add_argument('--local_rank', type=int, default=0)
     args = parser.parse_args()
+    args.opt='D:\Deep_Project\Deflow_Oren\DeFlow\codes\confs\DeFlow-DPED-RO.yml'
     if not args.opt.endswith('.yml'):
         args.opt += '.yml'
     opt = option.parse(args.opt, is_train=True)

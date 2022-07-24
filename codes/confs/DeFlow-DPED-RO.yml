@@ -12,14 +12,14 @@ datasets:
   train:
     name: Iphone_DSLR_tr
     mode: LQGT_multiclass
-    dataroot_GT: [ ../datasets/DPED-RO/DPEDiphone-tr-y/4x/,
-                   ../datasets/DPED-RO/DPEDiphone-tr-x/1x/ ]
-    dataroot_LQ: [ ../datasets/DPED-RO/DPEDiphone-tr-y/16x/,
-                   ../datasets/DPED-RO/DPEDiphone-tr-x/4x_reshaped/ ]
+    dataroot_GT: [ D:/Deep_Project/DeFlow/datasets/DPED-RWSR/train/canon/4x/,
+                   D:/Deep_Project/DeFlow/datasets/DPED-RWSR/train/iphone/1x/ ]
+    dataroot_LQ: [ D:/Deep_Project/DeFlow/datasets/DPED-RWSR/train/canon/16x/,
+                   D:/Deep_Project/DeFlow/datasets/DPED-RWSR/train/iphone/4x/ ]
 
-    n_workers: 3  # per GPU
+    n_workers: 0  # per GPU
     preload: False # set true to load images into ram for faster training
-    batch_size: 8
+    batch_size: 1
     balanced: True
     use_shuffle: true
     use_flip: true
@@ -31,10 +31,10 @@ datasets:
   val:
     name: Iphone_DSLR_va
     mode: LQGT_multiclass 
-    dataroot_GT: [../datasets/DPED-RO/DPEDiphone-val-y/4x/,
-                  ../datasets/DPED-RO/DPEDiphone-val-x/1x]
-    dataroot_LQ: [../datasets/DPED-RO/DPEDiphone-val-y/16x/,
-                  ../datasets/DPED-RO/DPEDiphone-val-x/4x_reshaped/]
+    dataroot_GT: [D:/Deep_Project/DeFlow/datasets/DPED-RWSR/validation/canon/4x/,
+                  D:/Deep_Project/DeFlow/datasets/DPED-RWSR/validation/iphone/1x]
+    dataroot_LQ: [D:/Deep_Project/DeFlow/datasets/DPED-RWSR/validation/canon/16x/,
+                  D:/Deep_Project/DeFlow/datasets/DPED-RWSR/validation/iphone/4x/]
     preload: False # set true to load images into ram for faster training
     center_crop_hr_size: 160
     quant: 32
@@ -75,7 +75,7 @@ network_G:
 #### path
 path:
   root: D:/DeFlow/DeFlow/codes
-  pretrain_model_G: ../trained_models/RRDB_models/RRDB_PSNR_x4.pth
+  pretrain_model_G: D:/Deep_Project/DeFlow/trained_models/RRDB_models/RRDB_PSNR_x4.pth
   strict_load: true
   resume_state: auto
 
