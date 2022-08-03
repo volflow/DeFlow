@@ -7,8 +7,8 @@ import PIL.Image as Image
 import cv2
 import os
 
-im_path1 = 'D:/Deep_Project/DeFlow/datasets/DPED-RWSR/train/canon/1x/'
-im_path2 = 'D:/Deep_Project/DeFlow/datasets/DPED-RWSR/train/iphone/1x/'
+im_path1 = 'D:/Deep_Project/DeFlow/datasets/DPED-RWSR/train/canon/16x/'
+im_path2 = 'D:/Deep_Project/DeFlow/datasets/DPED-RWSR/train/iphone/4x/'
 
 paths = ['D:/Deep_Project/DeFlow/datasets/DPED-RWSR/train/canon/1x/',
          'D:/Deep_Project/DeFlow/datasets/DPED-RWSR/train/canon/4x/',

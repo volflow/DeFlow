@@ -6,7 +6,7 @@ import random
 import logging
 import cv2
 import numpy as np
-
+import sys
 import torch
 import torch.distributed as dist
 import torch.multiprocessing as mp
@@ -215,7 +215,20 @@ def main():
             if current_step <= total_iters:
 
                 #### training
-                model.feed_data(train_data)
+                dslr_forH = train_data['LQ']
+                subset_indices=[]
+                print(train_data['LQ_path'])
+                for index,data in enumerate(train_data['LQ_path']):
+                    photo_num=(((train_data['LQ_path'][index].split('/'))[-1]).split('.'))[0]
+                    subset_indices.append(int(photo_num))
+                subset = torch.utils.data.Subset(train_set, subset_indices)
+                train_subset_loader = torch.utils.data.DataLoader(subset,batch_size=3,num_workers=0,shuffle=False)
+                for _,train_data2 in enumerate(train_subset_loader):
+                    dslr_forH = train_data2['LQ']
+                print(train_data2['LQ_path'])
+
+
+                model.feed_data(train_data,dslr_forH)
 
                 #### update learning rate
                 model.update_learning_rate(current_step, warmup_iter=opt['train']['warmup_iter'])

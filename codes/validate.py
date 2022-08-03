@@ -29,7 +29,8 @@ if __name__ == "__main__":
 
     if args.out_dir is None:
         args.out_dir = f'../results/{args.opt[:-4]}-{args.model_path.split("/")[-1][:-4]}{"-"+str(args.crop_size) if args.crop_size else ""}/'
-
+        args.out_dir='D:/DeFlow/results'
+    args.opt='D:\\Deep_Project\\Deflow_Oren\\DeFlow\\codes\\confs\\DeFlow-DPED-RO.yml'
     os.makedirs(args.out_dir, exist_ok=True)
     os.makedirs(args.out_dir+'/0_to_1', exist_ok=True)
     os.makedirs(args.out_dir+'/1_to_0', exist_ok=True)
@@ -37,7 +38,8 @@ if __name__ == "__main__":
     os.makedirs(args.out_dir+'/1_gen', exist_ok=True)
 
     model = create_model(util.getPredictorOdict(os.path.join("confs/", args.opt), args.model_path))
-    opt = option.parse("confs/" + args.opt, is_train=True)
+    #opt = option.parse("confs/" + args.opt, is_train=True)
+    opt = option.parse(args.opt, is_train=True)
     device = model.netG.module.mean_shift.device
 
     dataset_opt = opt['datasets']['val']

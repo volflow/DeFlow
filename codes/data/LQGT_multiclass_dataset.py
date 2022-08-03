@@ -4,7 +4,7 @@ import torch.utils.data as data
 import data.util as util
 from data import random_crop, center_crop, random_flip, random_rotation, imread
 import matlablike_resize
-
+import sys
 def getEnv(name): import os; return True if name in os.environ.keys() else False
 
 class LQGTMulticlassDataset(data.Dataset):
