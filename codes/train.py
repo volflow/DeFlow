@@ -10,7 +10,7 @@ import sys
 import torch
 import torch.distributed as dist
 import torch.multiprocessing as mp
-
+from torchvision.utils import save_image
 import options.options as option
 from utils import util
 from data import create_dataloader, create_dataset
@@ -44,7 +44,6 @@ def main():
                         help='job launcher')
     parser.add_argument('--local_rank', type=int, default=0)
     args = parser.parse_args()
-    args.opt='D:\Deep_Project\Deflow_Oren\DeFlow\codes\confs\DeFlow-DPED-RO.yml'
     if not args.opt.endswith('.yml'):
         args.opt += '.yml'
     opt = option.parse(args.opt, is_train=True)
@@ -170,6 +169,46 @@ def main():
             if rank <= 0:
                 logger.info('Number of val images in [{:s}]: {:d}'.format(
                     dataset_opt['name'], len(val_set)))
+        elif phase == 'patches':
+            train_set = create_dataset(dataset_opt)
+            print('Patches Dataset created')
+            train_size = int(
+                math.floor(len(train_set) / dataset_opt['batch_size']))
+            total_iters = int(opt['train']['niter'])
+            total_epochs = int(math.ceil(total_iters / train_size))
+            if opt['dist']:
+                patches_train_sampler = DistIterSampler(train_set, world_size, rank,
+                                                dataset_ratio)
+                total_epochs = int(
+                    math.ceil(total_iters / (train_size * dataset_ratio)))
+            elif opt_get(opt, ['datasets', 'patches', 'balanced'], False):
+                labels = np.asarray(train_set.y_labels)
+                unique, counts = np.unique(labels, return_counts=True)
+                print('balancing classes', dict(zip(unique, counts)))
+                weights = np.zeros_like(labels).astype(float)
+                for class_id, count in zip(unique, counts):
+                    weights[labels == class_id] = len(weights) / count
+                    print('class:', class_id, 'count:', count, 'total:',
+                          len(weights), 'weight:', len(weights) / count,
+                          'real', weights[labels == class_id].mean())
+                print('weights.shape', weights.shape)
+                patches_train_sampler = torch.utils.data.WeightedRandomSampler(weights,
+                                                                       num_samples=len(
+                                                                           weights),
+                                                                       replacement=True)
+            else:
+                patches_train_sampler = None
+
+            patches_train_loader = create_dataloader(train_set, dataset_opt, opt,
+                                         patches_train_sampler)
+
+            if rank <= 0:
+                logger.info(
+                    'Number of train images: {:,d}, iters: {:,d}'.format(
+                        len(train_set), train_size))
+                logger.info('Total epochs needed: {:d} for iters {:,d}'.format(
+                    total_epochs, total_iters))
+
         else:
             raise NotImplementedError('Phase [{:s}] is not recognized.'.format(phase))
     assert train_loader is not None
@@ -217,16 +256,15 @@ def main():
                 #### training
                 dslr_forH = train_data['LQ']
                 subset_indices=[]
-                print(train_data['LQ_path'])
-                for index,data in enumerate(train_data['LQ_path']):
-                    photo_num=(((train_data['LQ_path'][index].split('/'))[-1]).split('.'))[0]
-                    subset_indices.append(int(photo_num))
-                subset = torch.utils.data.Subset(train_set, subset_indices)
-                train_subset_loader = torch.utils.data.DataLoader(subset,batch_size=3,num_workers=0,shuffle=False)
-                for _,train_data2 in enumerate(train_subset_loader):
-                    dslr_forH = train_data2['LQ']
-                print(train_data2['LQ_path'])
-
+                if opt['train']['dslr_forH']:
+                    for index,data in enumerate(train_data['LQ_path']):
+                        photo_num=(((train_data['LQ_path'][index].split('/'))[-1]).split('.'))[0]
+                        photo_num=int(photo_num)
+                        subset_indices.append(int(photo_num))
+                    subset = torch.utils.data.Subset(train_set, subset_indices)
+                    train_subset_loader = torch.utils.data.DataLoader(subset,batch_size=opt['datasets']['train']['batch_size'],num_workers=0,shuffle=False)
+                    for _,train_data2 in enumerate(train_subset_loader):
+                        dslr_forH = train_data2['LQ']
 
                 model.feed_data(train_data,dslr_forH)
 
@@ -298,7 +336,7 @@ def main():
                 n_visual = 20
 
                 for idx, val_data in enumerate(val_loader):
-                    model.feed_data(val_data)
+                    model.feed_data(val_data,val_data['LQ'])
 
                     nll, epses, y_label = model.test()
                     if nll is None:

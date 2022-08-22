@@ -14,7 +14,7 @@ def imread(path):
 
 def create_dataloader(dataset, dataset_opt, opt=None, sampler=None):
     phase = dataset_opt.get('phase', 'test')
-    if phase == 'train':
+    if phase == 'train' or phase=='patches':
         gpu_ids = opt.get('gpu_ids', None)
         gpu_ids = gpu_ids if gpu_ids else []
         if opt['dist']:

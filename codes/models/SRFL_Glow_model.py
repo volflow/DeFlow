@@ -144,7 +144,7 @@ class SRFLGLOWModel(BaseModel):
         weight_fl = 1 if weight_fl is None else weight_fl
         if weight_fl > 0:
             print(self.dslr_forH.size())
-            print(self.var_L.size())
+            print(self.real_H.size())
             _, nll, _ = self.netG(gt=self.real_H, lr=self.dslr_forH, reverse=False, y_label=self.y_label)
             nll_loss = torch.mean(nll)
             losses['nll_loss'] = nll_loss * weight_fl
