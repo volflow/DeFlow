@@ -53,7 +53,7 @@ datasets:
     batch_size: 1
     balanced: True
     use_shuffle: true
-    use_flip: true
+    use_flip: False
     use_crop: true
     color: RGB
     GT_size: 96
@@ -110,6 +110,7 @@ train:
   lr_steps_rel: [0.5, 0.75, 0.9, 0.95]
   lr_gamma: 0.5
   dslr_forH: True
+  vgg_loss: True
   niter: 70000
   val_freq: 500
 

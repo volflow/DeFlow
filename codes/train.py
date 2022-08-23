@@ -17,7 +17,6 @@ from data import create_dataloader, create_dataset
 from models import create_model
 from utils.timer import Timer, TickTock
 from utils.util import get_resume_paths, opt_get
-
 import MeasureLib
 
 import psutil
@@ -170,19 +169,19 @@ def main():
                 logger.info('Number of val images in [{:s}]: {:d}'.format(
                     dataset_opt['name'], len(val_set)))
         elif phase == 'patches':
-            train_set = create_dataset(dataset_opt)
+            patches_train_set = create_dataset(dataset_opt)
             print('Patches Dataset created')
             train_size = int(
-                math.floor(len(train_set) / dataset_opt['batch_size']))
+                math.floor(len(patches_train_set) / dataset_opt['batch_size']))
             total_iters = int(opt['train']['niter'])
             total_epochs = int(math.ceil(total_iters / train_size))
             if opt['dist']:
-                patches_train_sampler = DistIterSampler(train_set, world_size, rank,
+                patches_train_sampler = DistIterSampler(patches_train_set, world_size, rank,
                                                 dataset_ratio)
                 total_epochs = int(
                     math.ceil(total_iters / (train_size * dataset_ratio)))
             elif opt_get(opt, ['datasets', 'patches', 'balanced'], False):
-                labels = np.asarray(train_set.y_labels)
+                labels = np.asarray(patches_train_set.y_labels)
                 unique, counts = np.unique(labels, return_counts=True)
                 print('balancing classes', dict(zip(unique, counts)))
                 weights = np.zeros_like(labels).astype(float)
@@ -199,7 +198,7 @@ def main():
             else:
                 patches_train_sampler = None
 
-            patches_train_loader = create_dataloader(train_set, dataset_opt, opt,
+            patches_train_loader = create_dataloader(patches_train_set, dataset_opt, opt,
                                          patches_train_sampler)
 
             if rank <= 0:
@@ -255,18 +254,34 @@ def main():
 
                 #### training
                 dslr_forH = train_data['LQ']
+                iphone_patches=None
+                canon_patches=None
                 subset_indices=[]
+
                 if opt['train']['dslr_forH']:
                     for index,data in enumerate(train_data['LQ_path']):
                         photo_num=(((train_data['LQ_path'][index].split('/'))[-1]).split('.'))[0]
                         photo_num=int(photo_num)
                         subset_indices.append(int(photo_num))
                     subset = torch.utils.data.Subset(train_set, subset_indices)
-                    train_subset_loader = torch.utils.data.DataLoader(subset,batch_size=opt['datasets']['train']['batch_size'],num_workers=0,shuffle=False)
+                    train_subset_loader = torch.utils.data.DataLoader(subset,batch_size=opt['datasets']['train']['batch_size'], num_workers=0,shuffle=False)
                     for _,train_data2 in enumerate(train_subset_loader):
                         dslr_forH = train_data2['LQ']
 
-                model.feed_data(train_data,dslr_forH)
+
+                if opt['train']['vgg_loss']:
+                    canon_patches_subset_indices=[random.randint(0,int(len(os.listdir(opt['datasets']['patches']['dataroot_GT'][0])))) for i in range(opt['datasets']['train']['batch_size'])]
+                    canon_patches_subset = torch.utils.data.Subset(patches_train_set, canon_patches_subset_indices)
+                    canon_patches_train_subset_loader = torch.utils.data.DataLoader(canon_patches_subset, batch_size=opt['datasets']['train']['batch_size'], num_workers=0, shuffle=False)
+                    iphone_patches_subset_indices=[canon_patches_subset_indices[i] + int(len(os.listdir(opt['datasets']['patches']['dataroot_GT'][0]))) for i in range(len(canon_patches_subset_indices))]
+                    iphone_patches_subset = torch.utils.data.Subset(patches_train_set, iphone_patches_subset_indices)
+                    iphone_patches_train_subset_loader = torch.utils.data.DataLoader(iphone_patches_subset, batch_size=opt['datasets']['train']['batch_size'], num_workers=0, shuffle=False)
+                    for _,canon_patches in enumerate(canon_patches_train_subset_loader):
+                        pass
+
+                    for _,iphone_patches in enumerate(iphone_patches_train_subset_loader):
+                        pass
+                model.feed_data(train_data,dslr_forH,iphone_patches,canon_patches)
 
                 #### update learning rate
                 model.update_learning_rate(current_step, warmup_iter=opt['train']['warmup_iter'])

@@ -114,12 +114,13 @@ class SRFLGLOWModel(BaseModel):
                     self.optimizer_G.param_groups[1]['params'].append(v)
         assert len(self.optimizer_G.param_groups[1]['params']) > 0
 
-    def feed_data(self, data,dslr_forH,need_GT=True):
+    def feed_data(self, data,dslr_forH,iphone_patches,canon_patches,need_GT=True):
 
         #sys.exit()
         self.var_L = data['LQ'].to(self.device)  # LQ
         self.dslr_forH=dslr_forH.to(self.device)
-
+        self.iphone_patches=iphone_patches
+        self.canon_patches=canon_patches
         if need_GT:
             self.real_H = data['GT'].to(self.device)  # GT
         
@@ -143,8 +144,8 @@ class SRFLGLOWModel(BaseModel):
         weight_fl = opt_get(self.opt, ['train', 'weight_fl'])
         weight_fl = 1 if weight_fl is None else weight_fl
         if weight_fl > 0:
-            print(self.dslr_forH.size())
-            print(self.real_H.size())
+            # print(self.dslr_forH.size())
+            # print(self.real_H.size())
             _, nll, _ = self.netG(gt=self.real_H, lr=self.dslr_forH, reverse=False, y_label=self.y_label)
             nll_loss = torch.mean(nll)
             losses['nll_loss'] = nll_loss * weight_fl
